@@ -31,7 +31,7 @@ public class ProductService {
     }
 
     public Optional<Product> findById(Long id) {
-        return Optional.empty();
+        return repository.findById(id);
     }
 
     public Page<Product> listAll(Pageable pageable) {

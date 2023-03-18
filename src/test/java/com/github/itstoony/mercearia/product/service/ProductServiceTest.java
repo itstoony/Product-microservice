@@ -14,6 +14,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -66,9 +67,44 @@ public class ProductServiceTest {
         // validation
         assertThat( updatedProduct.getId() ).isEqualTo(product.getId());
         assertThat( updatedProduct.getName() ).isEqualTo(product.getName());
-        assertThat( updatedProduct.getQuantity()).isEqualTo(product.getQuantity());
+        assertThat( updatedProduct.getQuantity() ).isEqualTo(product.getQuantity());
         assertThat( updatedProduct.getDescription() ).isEqualTo(product.getDescription());
 
+    }
+
+    @Test
+    @DisplayName("Should find a product by it's product")
+    public void findByIdTest() {
+        // scenery
+        long id = 1L;
+        Product product = createValidProduct();
+        product.setId(id);
+
+        BDDMockito.given(repository.findById(id)).willReturn(Optional.of(product));
+
+        // execution
+        Optional<Product> foundProduct = service.findById(id);
+
+        // validation
+        assertThat(foundProduct.isPresent()).isTrue();
+        assertThat(foundProduct.get().getId()).isEqualTo(id);
+        assertThat(foundProduct.get().getProductValue()).isEqualTo(product.getProductValue());
+        assertThat(foundProduct.get().getName()).isEqualTo(product.getName());
+        assertThat(foundProduct.get().getQuantity()).isEqualTo(product.getQuantity());
+
+    }
+
+    @Test
+    @DisplayName("Should return empty optional when trying to find a product by an invalid id")
+    public void findByInvalidIdTest() {
+        // scenery
+        Long id = 1L;
+
+        // execution
+        Optional<Product> foundBook = service.findById(id);
+
+        // validation
+        assertThat(foundBook.isEmpty()).isTrue();
     }
 
     private static Product createValidProduct() {
