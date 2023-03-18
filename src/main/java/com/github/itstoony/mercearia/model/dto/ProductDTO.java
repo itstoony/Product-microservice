@@ -21,7 +21,7 @@ public class ProductDTO {
     private String description;
 
     @NotNull
-    private BigDecimal value;
+    private BigDecimal productValue;
 
     @NotNull
     private Integer quantity;
