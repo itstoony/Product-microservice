@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.modelmapper.ModelMapper;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/product")
@@ -25,5 +26,14 @@ public class ProductController {
         Product savedProduct = productService.register(product);
 
         return modelMapper.map(savedProduct, ProductDTO.class);
+    }
+
+    @PutMapping("/{id}")
+    public ProductDTO update(@PathVariable Long id, @RequestBody ProductDTO dto) {
+        Product product = productService.findById(id).orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND) );
+
+        Product updatedProduct = productService.update(product, dto);
+
+        return modelMapper.map(updatedProduct, ProductDTO.class);
     }
 }

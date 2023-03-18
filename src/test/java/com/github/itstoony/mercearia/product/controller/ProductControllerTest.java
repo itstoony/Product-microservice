@@ -21,6 +21,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -89,6 +90,73 @@ public class ProductControllerTest {
                 .perform(request)
                 .andExpect(status().isBadRequest());
 
+    }
+
+    @Test
+    @DisplayName("Should update a product")
+    public void updateProductTest() throws Exception {
+        // scenery
+        Long id = 1L;
+        Product product = createValidProduct();
+
+        ProductDTO dto = ProductDTO.builder()
+                .name("Refrigerante light")
+                .quantity(15)
+                .value(new BigDecimal("9.0"))
+                .build();
+
+        Product updatedProduct = Product.builder()
+                .id(id)
+                .name(dto.getName())
+                .description(dto.getDescription())
+                .quantity(dto.getQuantity())
+                .value(dto.getValue())
+                .build();
+
+        String json = new ObjectMapper().writeValueAsString(dto);
+
+        BDDMockito.given( productService.findById(id) ).willReturn(Optional.of(product));
+        BDDMockito.given( productService.update(product, dto) ).willReturn(updatedProduct);
+
+        // execution
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .put(PRODUCT_API.concat("/" + id))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(json);
+
+        // validation
+        mvc
+                .perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("name").value(dto.getName()))
+                .andExpect(jsonPath("quantity").value(dto.getQuantity()))
+                .andExpect(jsonPath("description").value(dto.getDescription()))
+                .andExpect(jsonPath("value").value(dto.getValue()));
+    }
+
+    @Test
+    @DisplayName("Should return 404 not found with passing an invalid id")
+    public void updateProductWithInvalidIDTest() throws Exception {
+        // scenery
+        Long id = 1L;
+
+        BDDMockito.given( productService.findById(id) ).willReturn(Optional.empty());
+        ProductDTO dto = createValidProductDTO();
+
+        String json = new ObjectMapper().writeValueAsString(dto);
+
+        // execution
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .put(PRODUCT_API.concat("/" + id))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(json);
+
+        // validation
+        mvc
+                .perform(request)
+                .andExpect(status().isNotFound());
     }
 
     private static Product createValidProduct() {
