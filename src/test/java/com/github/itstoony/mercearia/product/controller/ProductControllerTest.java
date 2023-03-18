@@ -159,6 +159,48 @@ public class ProductControllerTest {
                 .andExpect(status().isNotFound());
     }
 
+    @Test
+    @DisplayName("Should find a product by it's id")
+    public void findByIdTest() throws Exception {
+        // scenery
+        Long id = 1L;
+        Product product = createValidProduct();
+
+        BDDMockito.given( productService.findById(id) ).willReturn(Optional.of(product) );
+
+        // execution
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .get(PRODUCT_API.concat("/" + id));
+
+        // validation
+        mvc
+                .perform(request)
+                .andExpect(jsonPath("id").value(id))
+                .andExpect(jsonPath("name").value(product.getName()))
+                .andExpect(jsonPath("quantity").value(product.getQuantity()))
+                .andExpect(jsonPath("description").value(product.getDescription()))
+                .andExpect(jsonPath("value").value(product.getValue()));
+
+    }
+
+    @Test
+    @DisplayName("Should return 404 not found when passed ID is invalid")
+    public void findByInvalidIdTest() throws Exception {
+        // scenery
+        Long id = 1L;
+
+        BDDMockito.given( productService.findById(id) ).willReturn(Optional.empty());
+
+        // execution
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .get(PRODUCT_API.concat("/" + id));
+
+        // validation
+        mvc
+                .perform(request)
+                .andExpect(status().isNotFound());
+    }
+
     private static Product createValidProduct() {
         return Product.builder()
                 .id(1L)
