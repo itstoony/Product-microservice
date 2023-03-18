@@ -8,6 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.BDDMockito;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -41,14 +42,15 @@ public class ProductControllerTest {
 
     @Test
     @DisplayName("Should register a product")
-    public void createProductTest() throws Exception {
+    public void registerProductTest() throws Exception {
         // scenery
         Product product = createValidProduct();
+
         ProductDTO dto = createValidProductDTO();
 
         String json = new ObjectMapper().writeValueAsString(dto);
 
-        BDDMockito.given( productService.register(product) ).willReturn(product);
+        BDDMockito.given( productService.register(Mockito.any(Product.class)) ).willReturn(product);
         // execution
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
                 .post(PRODUCT_API)
@@ -67,12 +69,35 @@ public class ProductControllerTest {
                 .andExpect(jsonPath("description").value(dto.getDescription()));
     }
 
+    @Test
+    @DisplayName("Should return 400 Bad Request when there are not enough information")
+    public void registerProductWithInsufficientDataTest() throws Exception {
+        // scenery
+        ProductDTO dto = ProductDTO.builder().build();
+
+        String json = new ObjectMapper().writeValueAsString(dto);
+
+        // execution
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .post(PRODUCT_API)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json);
+
+        // validation
+        mvc
+                .perform(request)
+                .andExpect(status().isBadRequest());
+
+    }
+
     private static Product createValidProduct() {
         return Product.builder()
+                .id(1L)
                 .name("Refrigerante")
                 .quantity(20)
                 .description("Convenção Guaraná 2L")
-                .value(new BigDecimal("10.00"))
+                .value(new BigDecimal("10.0"))
                 .build();
     }
 
@@ -81,7 +106,7 @@ public class ProductControllerTest {
                 .name("Refrigerante")
                 .quantity(20)
                 .description("Convenção Guaraná 2L")
-                .value(new BigDecimal("10.00"))
+                .value(new BigDecimal("10.0"))
                 .build();
     }
 
