@@ -21,7 +21,13 @@ public class ProductService {
     }
 
     public Product update(Product product, ProductDTO dto) {
-        return null;
+
+        product.setProductValue(Optional.ofNullable(dto.getProductValue()).orElse(product.getProductValue()));
+        product.setName(Optional.ofNullable(dto.getName()).orElse(product.getName()));
+        product.setDescription(Optional.ofNullable(dto.getDescription()).orElse(product.getDescription()));
+        product.setQuantity(Optional.ofNullable(dto.getQuantity()).orElse(product.getQuantity()));
+
+        return product;
     }
 
     public Optional<Product> findById(Long id) {

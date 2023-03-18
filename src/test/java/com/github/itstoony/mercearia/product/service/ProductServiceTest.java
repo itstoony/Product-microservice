@@ -1,6 +1,7 @@
 package com.github.itstoony.mercearia.product.service;
 
 import com.github.itstoony.mercearia.model.Product.Product;
+import com.github.itstoony.mercearia.model.dto.ProductDTO;
 import com.github.itstoony.mercearia.repository.ProductRepository;
 import com.github.itstoony.mercearia.service.ProductService;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,9 +48,31 @@ public class ProductServiceTest {
         assertThat(savedProduct.getDescription()).isEqualTo(product.getDescription());
     }
 
+    @Test
+    @DisplayName("Should update a product")
+    public void updateProductTest() {
+        // scenery
+        Product product = createValidProduct();
+
+        ProductDTO dto = ProductDTO.builder()
+                .name("Refrigerante light")
+                .quantity(15)
+                .productValue(new BigDecimal("9.0"))
+                .build();
+
+        // execution
+        Product updatedProduct = service.update(product, dto);
+
+        // validation
+        assertThat( updatedProduct.getId() ).isEqualTo(product.getId());
+        assertThat( updatedProduct.getName() ).isEqualTo(product.getName());
+        assertThat( updatedProduct.getQuantity()).isEqualTo(product.getQuantity());
+        assertThat( updatedProduct.getDescription() ).isEqualTo(product.getDescription());
+
+    }
+
     private static Product createValidProduct() {
         return Product.builder()
-                .id(1L)
                 .name("Refrigerante")
                 .quantity(20)
                 .description("Convenção Guaraná 2L")
