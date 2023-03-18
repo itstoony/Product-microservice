@@ -69,7 +69,7 @@ public class ProductControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("id").value(1L))
                 .andExpect(jsonPath("name").value(dto.getName()))
-                .andExpect(jsonPath("value").value(dto.getValue()))
+                .andExpect(jsonPath("productValue").value(dto.getProductValue()))
                 .andExpect(jsonPath("quantity").value(dto.getQuantity()))
                 .andExpect(jsonPath("description").value(dto.getDescription()));
     }
@@ -106,7 +106,7 @@ public class ProductControllerTest {
         ProductDTO dto = ProductDTO.builder()
                 .name("Refrigerante light")
                 .quantity(15)
-                .value(new BigDecimal("9.0"))
+                .productValue(new BigDecimal("9.0"))
                 .build();
 
         Product updatedProduct = Product.builder()
@@ -114,7 +114,7 @@ public class ProductControllerTest {
                 .name(dto.getName())
                 .description(dto.getDescription())
                 .quantity(dto.getQuantity())
-                .value(dto.getValue())
+                .productValue(dto.getProductValue())
                 .build();
 
         String json = new ObjectMapper().writeValueAsString(dto);
@@ -136,7 +136,7 @@ public class ProductControllerTest {
                 .andExpect(jsonPath("name").value(dto.getName()))
                 .andExpect(jsonPath("quantity").value(dto.getQuantity()))
                 .andExpect(jsonPath("description").value(dto.getDescription()))
-                .andExpect(jsonPath("value").value(dto.getValue()));
+                .andExpect(jsonPath("productValue").value(dto.getProductValue()));
     }
 
     @Test
@@ -183,7 +183,7 @@ public class ProductControllerTest {
                 .andExpect(jsonPath("name").value(product.getName()))
                 .andExpect(jsonPath("quantity").value(product.getQuantity()))
                 .andExpect(jsonPath("description").value(product.getDescription()))
-                .andExpect(jsonPath("value").value(product.getValue()));
+                .andExpect(jsonPath("productValue").value(product.getProductValue()));
 
     }
 
@@ -273,7 +273,7 @@ public class ProductControllerTest {
                 .name("Refrigerante")
                 .quantity(20)
                 .description("Convenção Guaraná 2L")
-                .value(new BigDecimal("10.0"))
+                .productValue(new BigDecimal("10.0"))
                 .build();
     }
 
@@ -282,7 +282,7 @@ public class ProductControllerTest {
                 .name("Refrigerante")
                 .quantity(20)
                 .description("Convenção Guaraná 2L")
-                .value(new BigDecimal("10.0"))
+                .productValue(new BigDecimal("10.0"))
                 .build();
     }
 
