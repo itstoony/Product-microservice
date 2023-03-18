@@ -6,6 +6,8 @@ import com.github.itstoony.mercearia.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -41,5 +43,10 @@ public class ProductController {
     public ProductDTO findById(@PathVariable Long id) {
         Product product = productService.findById(id).orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         return modelMapper.map(product, ProductDTO.class);
+    }
+
+    @GetMapping
+    public Page<Product> listAllProducts(Pageable pageable) {
+        return productService.listAll(pageable);
     }
 }

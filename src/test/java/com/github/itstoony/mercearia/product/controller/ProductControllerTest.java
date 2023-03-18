@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -21,8 +23,10 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.Optional;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -199,6 +203,29 @@ public class ProductControllerTest {
         mvc
                 .perform(request)
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("Should list all products")
+    public void listProductsTest() throws Exception {
+        // scenery
+        Product product = createValidProduct();
+
+        BDDMockito.given( productService.listAll(Mockito.any(Pageable.class)) )
+                .willReturn(new PageImpl<>(Collections.singletonList(product), Pageable.ofSize(100), 1) );
+
+        // execution
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .get(PRODUCT_API);
+
+        // validation
+        mvc
+                .perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("content", hasSize(1)))
+                .andExpect(jsonPath("totalElements").value(1))
+                .andExpect( jsonPath("pageable.pageSize").value(100))
+                .andExpect( jsonPath("pageable.pageNumber").value(0));
     }
 
     private static Product createValidProduct() {

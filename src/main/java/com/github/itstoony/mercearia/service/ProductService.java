@@ -2,6 +2,8 @@ package com.github.itstoony.mercearia.service;
 
 import com.github.itstoony.mercearia.model.Product.Product;
 import com.github.itstoony.mercearia.model.dto.ProductDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -19,5 +21,9 @@ public class ProductService {
 
     public Optional<Product> findById(Long id) {
         return Optional.empty();
+    }
+
+    public Page<Product> listAll(Pageable pageable) {
+        return null;
     }
 }
