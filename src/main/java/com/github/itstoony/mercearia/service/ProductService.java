@@ -26,4 +26,8 @@ public class ProductService {
     public Page<Product> listAll(Pageable pageable) {
         return null;
     }
+
+    public void delete(Product product) {
+
+    }
 }
