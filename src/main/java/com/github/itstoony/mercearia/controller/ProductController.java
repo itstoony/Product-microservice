@@ -49,4 +49,11 @@ public class ProductController {
     public Page<Product> listAllProducts(Pageable pageable) {
         return productService.listAll(pageable);
     }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long id) {
+        Product product = productService.findById(id).orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND) );
+        productService.delete(product);
+    }
 }

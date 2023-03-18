@@ -228,6 +228,45 @@ public class ProductControllerTest {
                 .andExpect( jsonPath("pageable.pageNumber").value(0));
     }
 
+    @Test
+    @DisplayName("Should delete a product by its id")
+    public void deleteProductTest() throws Exception {
+        // scenery
+        long id = 1L;
+        Product product = createValidProduct();
+
+        BDDMockito.given( productService.findById(id) ).willReturn(Optional.of(product));
+
+        // execution
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .delete(PRODUCT_API.concat("/" + id));
+
+        // validation
+        mvc
+                .perform(request)
+                .andExpect(status().isNoContent());
+
+    }
+
+    @Test
+    @DisplayName("Should return 404 not found when trying to delete a product by an invalid ID")
+    public void deleteProductWithInvalidIDTest() throws Exception{
+        // scenery
+        long id = 1L;
+
+        BDDMockito.given( productService.findById(id) ).willReturn(Optional.empty());
+
+        // execution
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .delete(PRODUCT_API.concat("/" + id));
+
+        // validation
+        mvc
+                .perform(request)
+                .andExpect(status().isNotFound());
+
+    }
+
     private static Product createValidProduct() {
         return Product.builder()
                 .id(1L)
