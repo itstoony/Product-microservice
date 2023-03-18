@@ -9,6 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.BDDMockito;
+import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -17,6 +18,8 @@ import java.math.BigDecimal;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
@@ -37,6 +40,7 @@ public class ProductServiceTest {
     public void registerProductTest() {
         // scenery
         Product product = createValidProduct();
+        product.setId(1L);
 
         BDDMockito.given( repository.save(product) ).willReturn(product);
         // execution
@@ -105,6 +109,38 @@ public class ProductServiceTest {
 
         // validation
         assertThat(foundBook.isEmpty()).isTrue();
+    }
+
+    @Test
+    @DisplayName("Should delete a product")
+    public void deleteProductTest() {
+        // scenery
+        Product product = createValidProduct();
+        product.setId(1L);
+
+        // execution
+        service.delete(product);
+
+        // validation
+        verify(repository, Mockito.times(1)).delete(product);
+
+    }
+
+    @Test
+    @DisplayName("Should not delete an unsaved product")
+    public void deleteUnsavedProductTest() {
+        // scenery
+        Product product = createValidProduct();
+        String message = "Can't delete an unsaved product";
+
+        // execution
+        Throwable ex = catchThrowable(() -> service.delete(product));
+
+        // validation
+        assertThat(ex).isInstanceOf(IllegalArgumentException.class);
+        assertThat(ex).hasMessage(message);
+        verify(repository, Mockito.never()).delete(product);
+
     }
 
     private static Product createValidProduct() {

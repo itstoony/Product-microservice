@@ -39,6 +39,9 @@ public class ProductService {
     }
 
     public void delete(Product product) {
-
+        if (product == null || product.getId() == null) {
+                throw new IllegalArgumentException("Can't delete an unsaved product");
+        }
+        repository.delete(product);
     }
 }
