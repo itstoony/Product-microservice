@@ -34,7 +34,7 @@ public class ProductService {
         return repository.findById(id);
     }
 
-    public Page<Product> listAll(Pageable pageable) {
+    public Page<Product> listAll(String name, Pageable pageable) {
         return null;
     }
 

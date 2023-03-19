@@ -46,8 +46,8 @@ public class ProductController {
     }
 
     @GetMapping
-    public Page<Product> listAllProducts(Pageable pageable) {
-        return productService.listAll(pageable);
+    public Page<Product> listAllProducts(@RequestBody String name,  Pageable pageable) {
+        return productService.listAll(name, pageable);
     }
 
     @DeleteMapping("/{id}")
