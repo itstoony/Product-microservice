@@ -210,18 +210,13 @@ public class ProductControllerTest {
     public void listProductsTest() throws Exception {
         // scenery
         Product product = createValidProduct();
-
-        String json = new ObjectMapper().writeValueAsString("Refrigerante");
-
+        String name = "Refrig";
         BDDMockito.given( productService.listAll(Mockito.any(String.class), Mockito.any(Pageable.class) ) )
                 .willReturn(new PageImpl<>(Collections.singletonList(product), Pageable.ofSize(100), 1) );
 
         // execution
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
-                .get(PRODUCT_API)
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(json);
+                .get(PRODUCT_API.concat("/list?name="+name));
 
         // validation
         mvc
