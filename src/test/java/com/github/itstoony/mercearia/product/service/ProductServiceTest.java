@@ -11,15 +11,21 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.BDDMockito;
 import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
@@ -140,6 +146,30 @@ public class ProductServiceTest {
         assertThat(ex).isInstanceOf(IllegalArgumentException.class);
         assertThat(ex).hasMessage(message);
         verify(repository, Mockito.never()).delete(product);
+    }
+
+    @Test
+    @DisplayName("Should return a page of products filtering by it's name")
+    public void findAllTest() {
+        // scenery
+        Product product = createValidProduct();
+        product.setId(1L);
+
+        String name = "Refrigerante";
+        PageRequest pageable = PageRequest.of(0, 10);
+        PageImpl<Product> page = new PageImpl<>(Collections.singletonList(product), pageable, 1);
+
+        when( repository.findByName(Mockito.any(String.class), Mockito.any(Pageable.class)) )
+                .thenReturn(page);
+
+        // execution
+        Page<Product> result = service.listAll(name, pageable);
+
+        // validation
+        assertThat(result.getTotalElements()).isEqualTo(1);
+        assertThat(result.getContent()).isEqualTo(Collections.singletonList(product));
+        assertThat(result.getPageable().getPageNumber()).isEqualTo(0);
+        assertThat(result.getPageable().getPageSize()).isEqualTo(10);
 
     }
 

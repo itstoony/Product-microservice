@@ -35,7 +35,7 @@ public class ProductService {
     }
 
     public Page<Product> listAll(String name, Pageable pageable) {
-        return null;
+        return repository.findByName(name, pageable);
     }
 
     public void delete(Product product) {
