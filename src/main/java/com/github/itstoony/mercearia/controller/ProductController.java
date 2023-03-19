@@ -45,8 +45,8 @@ public class ProductController {
         return modelMapper.map(product, ProductDTO.class);
     }
 
-    @GetMapping
-    public Page<Product> listAllProducts(@RequestBody String name,  Pageable pageable) {
+    @GetMapping("/list")
+    public Page<Product> listAllProducts(@RequestParam String name,  Pageable pageable) {
         return productService.listAll(name, pageable);
     }
 

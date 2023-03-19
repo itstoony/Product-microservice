@@ -27,6 +27,8 @@ public class ProductService {
         product.setDescription(Optional.ofNullable(dto.getDescription()).orElse(product.getDescription()));
         product.setQuantity(Optional.ofNullable(dto.getQuantity()).orElse(product.getQuantity()));
 
+        repository.save(product);
+
         return product;
     }
 
