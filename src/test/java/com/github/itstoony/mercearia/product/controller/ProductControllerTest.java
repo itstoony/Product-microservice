@@ -211,12 +211,17 @@ public class ProductControllerTest {
         // scenery
         Product product = createValidProduct();
 
-        BDDMockito.given( productService.listAll(Mockito.any(Pageable.class)) )
+        String json = new ObjectMapper().writeValueAsString("Refrigerante");
+
+        BDDMockito.given( productService.listAll(Mockito.any(String.class), Mockito.any(Pageable.class) ) )
                 .willReturn(new PageImpl<>(Collections.singletonList(product), Pageable.ofSize(100), 1) );
 
         // execution
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
-                .get(PRODUCT_API);
+                .get(PRODUCT_API)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json);
 
         // validation
         mvc
@@ -250,7 +255,7 @@ public class ProductControllerTest {
 
     @Test
     @DisplayName("Should return 404 not found when trying to delete a product by an invalid ID")
-    public void deleteProductWithInvalidIDTest() throws Exception{
+    public void deleteProductWithInvalidIDTest() throws Exception {
         // scenery
         long id = 1L;
 
@@ -285,6 +290,5 @@ public class ProductControllerTest {
                 .productValue(new BigDecimal("10.0"))
                 .build();
     }
-
 
 }
