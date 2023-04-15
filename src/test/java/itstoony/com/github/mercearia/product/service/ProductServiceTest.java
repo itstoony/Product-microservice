@@ -1,9 +1,9 @@
-package com.github.itstoony.mercearia.product.service;
+package itstoony.com.github.mercearia.product.service;
 
-import com.github.itstoony.mercearia.model.Product.Product;
-import com.github.itstoony.mercearia.model.dto.ProductDTO;
-import com.github.itstoony.mercearia.repository.ProductRepository;
-import com.github.itstoony.mercearia.service.ProductService;
+import itstoony.com.github.mercearia.model.Product.Product;
+import itstoony.com.github.mercearia.repository.ProductRepository;
+import itstoony.com.github.mercearia.service.ProductService;
+import itstoony.com.github.mercearia.dto.ProductDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,7 +29,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
-public class ProductServiceTest {
+ class ProductServiceTest {
 
     ProductService service;
 
@@ -43,7 +43,7 @@ public class ProductServiceTest {
 
     @Test
     @DisplayName("Should register a product")
-    public void registerProductTest() {
+     void registerProductTest() {
         // scenery
         Product product = createValidProduct();
         product.setId(1L);
@@ -61,7 +61,7 @@ public class ProductServiceTest {
 
     @Test
     @DisplayName("Should update a product")
-    public void updateProductTest() {
+     void updateProductTest() {
         // scenery
         Product product = createValidProduct();
 
@@ -84,7 +84,7 @@ public class ProductServiceTest {
 
     @Test
     @DisplayName("Should find a product by it's product")
-    public void findByIdTest() {
+     void findByIdTest() {
         // scenery
         long id = 1L;
         Product product = createValidProduct();
@@ -106,7 +106,7 @@ public class ProductServiceTest {
 
     @Test
     @DisplayName("Should return empty optional when trying to find a product by an invalid id")
-    public void findByInvalidIdTest() {
+     void findByInvalidIdTest() {
         // scenery
         Long id = 1L;
 
@@ -119,7 +119,7 @@ public class ProductServiceTest {
 
     @Test
     @DisplayName("Should delete a product")
-    public void deleteProductTest() {
+     void deleteProductTest() {
         // scenery
         Product product = createValidProduct();
         product.setId(1L);
@@ -134,7 +134,7 @@ public class ProductServiceTest {
 
     @Test
     @DisplayName("Should not delete an unsaved product")
-    public void deleteUnsavedProductTest() {
+     void deleteUnsavedProductTest() {
         // scenery
         Product product = createValidProduct();
         String message = "Can't delete an unsaved product";
@@ -143,14 +143,16 @@ public class ProductServiceTest {
         Throwable ex = catchThrowable(() -> service.delete(product));
 
         // validation
-        assertThat(ex).isInstanceOf(IllegalArgumentException.class);
-        assertThat(ex).hasMessage(message);
+        assertThat(ex)
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(message);
+
         verify(repository, Mockito.never()).delete(product);
     }
 
     @Test
     @DisplayName("Should return a page of products filtering by it's name")
-    public void findAllTest() {
+     void findAllTest() {
         // scenery
         Product product = createValidProduct();
         product.setId(1L);
@@ -168,7 +170,7 @@ public class ProductServiceTest {
         // validation
         assertThat(result.getTotalElements()).isEqualTo(1);
         assertThat(result.getContent()).isEqualTo(Collections.singletonList(product));
-        assertThat(result.getPageable().getPageNumber()).isEqualTo(0);
+        assertThat(result.getPageable().getPageNumber()).isZero();
         assertThat(result.getPageable().getPageSize()).isEqualTo(10);
 
     }

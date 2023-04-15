@@ -1,7 +1,7 @@
-package com.github.itstoony.mercearia.product.repository;
+package itstoony.com.github.mercearia.product.repository;
 
-import com.github.itstoony.mercearia.model.Product.Product;
-import com.github.itstoony.mercearia.repository.ProductRepository;
+import itstoony.com.github.mercearia.model.Product.Product;
+import itstoony.com.github.mercearia.repository.ProductRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DataJpaTest
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
-public class ProductRepositoryTest {
+ class ProductRepositoryTest {
 
     @Autowired
     TestEntityManager entityManager;
@@ -30,7 +30,7 @@ public class ProductRepositoryTest {
 
     @Test
     @DisplayName("Should return a page of products filtering by name")
-    public void findByNameTest() {
+     void findByNameTest() {
         // scenery
         Product product = createValidProduct();
         String name = "Refrigeran";
@@ -44,7 +44,7 @@ public class ProductRepositoryTest {
         assertThat(result.getContent()).hasSize(1);
         assertThat(result.getContent()).contains(product);
         assertThat(result.getPageable().getPageSize()).isEqualTo(10);
-        assertThat(result.getPageable().getPageNumber()).isEqualTo(0);
+        assertThat(result.getPageable().getPageNumber()).isZero();
         assertThat(result.getTotalElements()).isEqualTo(1);
 
     }
