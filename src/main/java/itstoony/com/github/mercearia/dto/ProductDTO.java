@@ -1,4 +1,4 @@
-package com.github.itstoony.mercearia.model.dto;
+package itstoony.com.github.mercearia.dto;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -9,7 +9,8 @@ import java.math.BigDecimal;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
 public class ProductDTO {
 
     private Long id;

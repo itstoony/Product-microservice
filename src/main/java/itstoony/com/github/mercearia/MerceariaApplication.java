@@ -1,4 +1,4 @@
-package com.github.itstoony.mercearia;
+package itstoony.com.github.mercearia;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.SpringApplication;

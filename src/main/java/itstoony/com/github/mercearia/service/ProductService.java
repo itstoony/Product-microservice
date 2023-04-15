@@ -1,8 +1,8 @@
-package com.github.itstoony.mercearia.service;
+package itstoony.com.github.mercearia.service;
 
-import com.github.itstoony.mercearia.model.Product.Product;
-import com.github.itstoony.mercearia.model.dto.ProductDTO;
-import com.github.itstoony.mercearia.repository.ProductRepository;
+import itstoony.com.github.mercearia.model.Product.Product;
+import itstoony.com.github.mercearia.dto.ProductDTO;
+import itstoony.com.github.mercearia.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

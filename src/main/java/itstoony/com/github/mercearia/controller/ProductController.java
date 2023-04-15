@@ -1,8 +1,8 @@
-package com.github.itstoony.mercearia.controller;
+package itstoony.com.github.mercearia.controller;
 
-import com.github.itstoony.mercearia.model.Product.Product;
-import com.github.itstoony.mercearia.model.dto.ProductDTO;
-import com.github.itstoony.mercearia.service.ProductService;
+import itstoony.com.github.mercearia.model.Product.Product;
+import itstoony.com.github.mercearia.service.ProductService;
+import itstoony.com.github.mercearia.dto.ProductDTO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
