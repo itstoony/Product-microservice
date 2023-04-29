@@ -1,9 +1,10 @@
 package itstoony.com.github.mercearia.product.service;
 
+import itstoony.com.github.mercearia.dto.ProductDTO;
 import itstoony.com.github.mercearia.model.Product.Product;
+
 import itstoony.com.github.mercearia.repository.ProductRepository;
 import itstoony.com.github.mercearia.service.ProductService;
-import itstoony.com.github.mercearia.dto.ProductDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,6 +23,7 @@ import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Optional;
 
+import static itstoony.com.github.mercearia.product.utils.Utils.createValidProduct;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.Mockito.verify;
@@ -29,159 +31,152 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
- class ProductServiceTest {
+class ProductServiceTest {
 
-    ProductService service;
+   ProductService service;
 
-    @MockBean
-    ProductRepository repository;
+   @MockBean
+   ProductRepository repository;
 
-    @BeforeEach
-    public void setUp() {
-        this.service = new ProductService(repository);
-    }
+   @BeforeEach
+   void setUp() {
+      this.service = new ProductService(repository);
+   }
 
-    @Test
-    @DisplayName("Should register a product")
-     void registerProductTest() {
-        // scenery
-        Product product = createValidProduct();
-        product.setId(1L);
+   @Test
+   @DisplayName("Should register a product")
+   void registerProductTest() {
+      // scenery
+      Product product = createValidProduct();
+      product.setId(1L);
 
-        BDDMockito.given( repository.save(product) ).willReturn(product);
-        // execution
-        Product savedProduct = service.register(product);
+      BDDMockito.given( repository.save(product) ).willReturn(product);
+      // execution
+      Product savedProduct = service.register(product);
 
-        // validation
-        assertThat(savedProduct.getId()).isNotNull();
-        assertThat(savedProduct.getName()).isEqualTo(product.getName());
-        assertThat(savedProduct.getQuantity()).isEqualTo(product.getQuantity());
-        assertThat(savedProduct.getDescription()).isEqualTo(product.getDescription());
-    }
+      // validation
+      assertThat(savedProduct.getId()).isNotNull();
+      assertThat(savedProduct.getName()).isEqualTo(product.getName());
+      assertThat(savedProduct.getQuantity()).isEqualTo(product.getQuantity());
+      assertThat(savedProduct.getDescription()).isEqualTo(product.getDescription());
+   }
 
-    @Test
-    @DisplayName("Should update a product")
-     void updateProductTest() {
-        // scenery
-        Product product = createValidProduct();
+   @Test
+   @DisplayName("Should update a product")
+   void updateProductTest() {
+      // scenery
+      Product product = createValidProduct();
 
-        ProductDTO dto = ProductDTO.builder()
-                .name("Refrigerante light")
-                .quantity(15)
-                .productValue(new BigDecimal("9.0"))
-                .build();
+      ProductDTO dto = ProductDTO.builder()
+              .name("Refrigerante light")
+              .quantity(15)
+              .productValue(new BigDecimal("9.0"))
+              .build();
 
-        // execution
-        Product updatedProduct = service.update(product, dto);
+      // execution
+      Product updatedProduct = service.update(product, dto);
 
-        // validation
-        assertThat( updatedProduct.getId() ).isEqualTo(product.getId());
-        assertThat( updatedProduct.getName() ).isEqualTo(product.getName());
-        assertThat( updatedProduct.getQuantity() ).isEqualTo(product.getQuantity());
-        assertThat( updatedProduct.getDescription() ).isEqualTo(product.getDescription());
+      // validation
+      assertThat( updatedProduct.getId() ).isEqualTo(product.getId());
+      assertThat( updatedProduct.getName() ).isEqualTo(product.getName());
+      assertThat( updatedProduct.getQuantity() ).isEqualTo(product.getQuantity());
+      assertThat( updatedProduct.getDescription() ).isEqualTo(product.getDescription());
 
-    }
+   }
 
-    @Test
-    @DisplayName("Should find a product by it's product")
-     void findByIdTest() {
-        // scenery
-        long id = 1L;
-        Product product = createValidProduct();
-        product.setId(id);
+   @Test
+   @DisplayName("Should find a product by it's product")
+   void findByIdTest() {
+      // scenery
+      long id = 1L;
+      Product product = createValidProduct();
+      product.setId(id);
 
-        BDDMockito.given(repository.findById(id)).willReturn(Optional.of(product));
+      BDDMockito.given(repository.findById(id)).willReturn(Optional.of(product));
 
-        // execution
-        Optional<Product> foundProduct = service.findById(id);
+      // execution
+      Optional<Product> foundProduct = service.findById(id);
 
-        // validation
-        assertThat(foundProduct.isPresent()).isTrue();
-        assertThat(foundProduct.get().getId()).isEqualTo(id);
-        assertThat(foundProduct.get().getProductValue()).isEqualTo(product.getProductValue());
-        assertThat(foundProduct.get().getName()).isEqualTo(product.getName());
-        assertThat(foundProduct.get().getQuantity()).isEqualTo(product.getQuantity());
+      // validation
+      assertThat(foundProduct).isPresent();
+      assertThat(foundProduct.get().getId()).isEqualTo(id);
+      assertThat(foundProduct.get().getProductValue()).isEqualTo(product.getProductValue());
+      assertThat(foundProduct.get().getName()).isEqualTo(product.getName());
+      assertThat(foundProduct.get().getQuantity()).isEqualTo(product.getQuantity());
 
-    }
+   }
 
-    @Test
-    @DisplayName("Should return empty optional when trying to find a product by an invalid id")
-     void findByInvalidIdTest() {
-        // scenery
-        Long id = 1L;
+   @Test
+   @DisplayName("Should return empty optional when trying to find a product by an invalid id")
+   void findByInvalidIdTest() {
+      // scenery
+      Long id = 1L;
 
-        // execution
-        Optional<Product> foundBook = service.findById(id);
+      // execution
+      Optional<Product> foundBook = service.findById(id);
 
-        // validation
-        assertThat(foundBook.isEmpty()).isTrue();
-    }
+      // validation
+      assertThat(foundBook).isNotPresent();
+   }
 
-    @Test
-    @DisplayName("Should delete a product")
-     void deleteProductTest() {
-        // scenery
-        Product product = createValidProduct();
-        product.setId(1L);
+   @Test
+   @DisplayName("Should delete a product")
+   void deleteProductTest() {
+      // scenery
+      Product product = createValidProduct();
+      product.setId(1L);
 
-        // execution
-        service.delete(product);
+      // execution
+      service.delete(product);
 
-        // validation
-        verify(repository, Mockito.times(1)).delete(product);
+      // validation
+      verify(repository, Mockito.times(1)).delete(product);
 
-    }
+   }
 
-    @Test
-    @DisplayName("Should not delete an unsaved product")
-     void deleteUnsavedProductTest() {
-        // scenery
-        Product product = createValidProduct();
-        String message = "Can't delete an unsaved product";
+   @Test
+   @DisplayName("Should not delete an unsaved product")
+   void deleteUnsavedProductTest() {
+      // scenery
+      Product product = createValidProduct();
+      product.setId(null);
 
-        // execution
-        Throwable ex = catchThrowable(() -> service.delete(product));
+      String message = "Can't delete an unsaved product";
 
-        // validation
-        assertThat(ex)
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage(message);
+      // execution
+      Throwable ex = catchThrowable(() -> service.delete(product));
 
-        verify(repository, Mockito.never()).delete(product);
-    }
+      // validation
+      assertThat(ex)
+              .isInstanceOf(IllegalArgumentException.class)
+              .hasMessage(message);
 
-    @Test
-    @DisplayName("Should return a page of products filtering by it's name")
-     void findAllTest() {
-        // scenery
-        Product product = createValidProduct();
-        product.setId(1L);
+      verify(repository, Mockito.never()).delete(product);
+   }
 
-        String name = "Refrigerante";
-        PageRequest pageable = PageRequest.of(0, 10);
-        PageImpl<Product> page = new PageImpl<>(Collections.singletonList(product), pageable, 1);
+   @Test
+   @DisplayName("Should return a page of products filtering by it's name")
+   void findAllTest() {
+      // scenery
+      Product product = createValidProduct();
+      product.setId(1L);
 
-        when( repository.findByName(Mockito.any(String.class), Mockito.any(Pageable.class)) )
-                .thenReturn(page);
+      String name = "Refrigerante";
+      PageRequest pageable = PageRequest.of(0, 10);
+      PageImpl<Product> page = new PageImpl<>(Collections.singletonList(product), pageable, 1);
 
-        // execution
-        Page<Product> result = service.listAll(name, pageable);
+      when( repository.findByName(Mockito.any(String.class), Mockito.any(Pageable.class)) )
+              .thenReturn(page);
 
-        // validation
-        assertThat(result.getTotalElements()).isEqualTo(1);
-        assertThat(result.getContent()).isEqualTo(Collections.singletonList(product));
-        assertThat(result.getPageable().getPageNumber()).isZero();
-        assertThat(result.getPageable().getPageSize()).isEqualTo(10);
+      // execution
+      Page<Product> result = service.listAll(name, pageable);
 
-    }
+      // validation
+      assertThat(result.getTotalElements()).isEqualTo(1);
+      assertThat(result.getContent()).isEqualTo(Collections.singletonList(product));
+      assertThat(result.getPageable().getPageNumber()).isZero();
+      assertThat(result.getPageable().getPageSize()).isEqualTo(10);
 
-    private static Product createValidProduct() {
-        return Product.builder()
-                .name("Refrigerante")
-                .quantity(20)
-                .description("Convenção Guaraná 2L")
-                .productValue(new BigDecimal("10.0"))
-                .build();
-    }
+   }
 
 }
