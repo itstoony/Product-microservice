@@ -22,6 +22,7 @@ import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Optional;
 
+import static com.github.itstoony.mercearia.product.utils.Utils.createValidProduct;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.Mockito.verify;
@@ -29,7 +30,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
-public class ProductServiceTest {
+class ProductServiceTest {
 
     ProductService service;
 
@@ -37,13 +38,13 @@ public class ProductServiceTest {
     ProductRepository repository;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         this.service = new ProductService(repository);
     }
 
     @Test
     @DisplayName("Should register a product")
-    public void registerProductTest() {
+    void registerProductTest() {
         // scenery
         Product product = createValidProduct();
         product.setId(1L);
@@ -61,7 +62,7 @@ public class ProductServiceTest {
 
     @Test
     @DisplayName("Should update a product")
-    public void updateProductTest() {
+    void updateProductTest() {
         // scenery
         Product product = createValidProduct();
 
@@ -84,7 +85,7 @@ public class ProductServiceTest {
 
     @Test
     @DisplayName("Should find a product by it's product")
-    public void findByIdTest() {
+    void findByIdTest() {
         // scenery
         long id = 1L;
         Product product = createValidProduct();
@@ -96,7 +97,7 @@ public class ProductServiceTest {
         Optional<Product> foundProduct = service.findById(id);
 
         // validation
-        assertThat(foundProduct.isPresent()).isTrue();
+        assertThat(foundProduct).isPresent();
         assertThat(foundProduct.get().getId()).isEqualTo(id);
         assertThat(foundProduct.get().getProductValue()).isEqualTo(product.getProductValue());
         assertThat(foundProduct.get().getName()).isEqualTo(product.getName());
@@ -106,7 +107,7 @@ public class ProductServiceTest {
 
     @Test
     @DisplayName("Should return empty optional when trying to find a product by an invalid id")
-    public void findByInvalidIdTest() {
+    void findByInvalidIdTest() {
         // scenery
         Long id = 1L;
 
@@ -114,12 +115,12 @@ public class ProductServiceTest {
         Optional<Product> foundBook = service.findById(id);
 
         // validation
-        assertThat(foundBook.isEmpty()).isTrue();
+        assertThat(foundBook).isNotPresent();
     }
 
     @Test
     @DisplayName("Should delete a product")
-    public void deleteProductTest() {
+    void deleteProductTest() {
         // scenery
         Product product = createValidProduct();
         product.setId(1L);
@@ -134,23 +135,27 @@ public class ProductServiceTest {
 
     @Test
     @DisplayName("Should not delete an unsaved product")
-    public void deleteUnsavedProductTest() {
+    void deleteUnsavedProductTest() {
         // scenery
         Product product = createValidProduct();
+        product.setId(null);
+
         String message = "Can't delete an unsaved product";
 
         // execution
         Throwable ex = catchThrowable(() -> service.delete(product));
 
         // validation
-        assertThat(ex).isInstanceOf(IllegalArgumentException.class);
-        assertThat(ex).hasMessage(message);
+        assertThat(ex)
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage(message);
+
         verify(repository, Mockito.never()).delete(product);
     }
 
     @Test
     @DisplayName("Should return a page of products filtering by it's name")
-    public void findAllTest() {
+    void findAllTest() {
         // scenery
         Product product = createValidProduct();
         product.setId(1L);
@@ -168,18 +173,9 @@ public class ProductServiceTest {
         // validation
         assertThat(result.getTotalElements()).isEqualTo(1);
         assertThat(result.getContent()).isEqualTo(Collections.singletonList(product));
-        assertThat(result.getPageable().getPageNumber()).isEqualTo(0);
+        assertThat(result.getPageable().getPageNumber()).isZero();
         assertThat(result.getPageable().getPageSize()).isEqualTo(10);
 
-    }
-
-    private static Product createValidProduct() {
-        return Product.builder()
-                .name("Refrigerante")
-                .quantity(20)
-                .description("Convenção Guaraná 2L")
-                .productValue(new BigDecimal("10.0"))
-                .build();
     }
 
 }

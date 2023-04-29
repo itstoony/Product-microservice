@@ -26,6 +26,8 @@ import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Optional;
 
+import static com.github.itstoony.mercearia.product.utils.Utils.createValidProduct;
+import static com.github.itstoony.mercearia.product.utils.Utils.createValidProductDTO;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -34,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @WebMvcTest
 @ActiveProfiles("test")
-public class ProductControllerTest {
+class ProductControllerTest {
 
     static String PRODUCT_API = "/api/product";
 
@@ -47,7 +49,7 @@ public class ProductControllerTest {
 
     @Test
     @DisplayName("Should register a product")
-    public void registerProductTest() throws Exception {
+    void registerProductTest() throws Exception {
         // scenery
         Product product = createValidProduct();
 
@@ -76,7 +78,7 @@ public class ProductControllerTest {
 
     @Test
     @DisplayName("Should return 400 Bad Request when there are not enough information")
-    public void registerProductWithInsufficientDataTest() throws Exception {
+    void registerProductWithInsufficientDataTest() throws Exception {
         // scenery
         ProductDTO dto = ProductDTO.builder().build();
 
@@ -98,7 +100,7 @@ public class ProductControllerTest {
 
     @Test
     @DisplayName("Should update a product")
-    public void updateProductTest() throws Exception {
+    void updateProductTest() throws Exception {
         // scenery
         Long id = 1L;
         Product product = createValidProduct();
@@ -141,7 +143,7 @@ public class ProductControllerTest {
 
     @Test
     @DisplayName("Should return 404 not found with passing an invalid id")
-    public void updateProductWithInvalidIDTest() throws Exception {
+    void updateProductWithInvalidIDTest() throws Exception {
         // scenery
         Long id = 1L;
 
@@ -165,7 +167,7 @@ public class ProductControllerTest {
 
     @Test
     @DisplayName("Should find a product by it's id")
-    public void findByIdTest() throws Exception {
+    void findByIdTest() throws Exception {
         // scenery
         Long id = 1L;
         Product product = createValidProduct();
@@ -189,7 +191,7 @@ public class ProductControllerTest {
 
     @Test
     @DisplayName("Should return 404 not found when passed ID is invalid")
-    public void findByInvalidIdTest() throws Exception {
+    void findByInvalidIdTest() throws Exception {
         // scenery
         Long id = 1L;
 
@@ -207,7 +209,7 @@ public class ProductControllerTest {
 
     @Test
     @DisplayName("Should list all products")
-    public void listProductsTest() throws Exception {
+    void listProductsTest() throws Exception {
         // scenery
         Product product = createValidProduct();
         String name = "Refrig";
@@ -230,7 +232,7 @@ public class ProductControllerTest {
 
     @Test
     @DisplayName("Should delete a product by its id")
-    public void deleteProductTest() throws Exception {
+    void deleteProductTest() throws Exception {
         // scenery
         long id = 1L;
         Product product = createValidProduct();
@@ -250,7 +252,7 @@ public class ProductControllerTest {
 
     @Test
     @DisplayName("Should return 404 not found when trying to delete a product by an invalid ID")
-    public void deleteProductWithInvalidIDTest() throws Exception {
+    void deleteProductWithInvalidIDTest() throws Exception {
         // scenery
         long id = 1L;
 
@@ -265,25 +267,6 @@ public class ProductControllerTest {
                 .perform(request)
                 .andExpect(status().isNotFound());
 
-    }
-
-    private static Product createValidProduct() {
-        return Product.builder()
-                .id(1L)
-                .name("Refrigerante")
-                .quantity(20)
-                .description("Convenção Guaraná 2L")
-                .productValue(new BigDecimal("10.0"))
-                .build();
-    }
-
-    private static ProductDTO createValidProductDTO() {
-        return ProductDTO.builder()
-                .name("Refrigerante")
-                .quantity(20)
-                .description("Convenção Guaraná 2L")
-                .productValue(new BigDecimal("10.0"))
-                .build();
     }
 
 }
