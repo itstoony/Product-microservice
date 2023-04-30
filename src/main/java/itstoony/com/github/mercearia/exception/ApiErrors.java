@@ -24,4 +24,7 @@ public class ApiErrors {
         this.errors = Collections.singletonList(ex.getReason());
     }
 
+    public List<String> getErrors() {
+        return errors;
+    }
 }
