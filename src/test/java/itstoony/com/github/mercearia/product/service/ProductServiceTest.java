@@ -1,6 +1,7 @@
 package itstoony.com.github.mercearia.product.service;
 
 import itstoony.com.github.mercearia.dto.ProductDTO;
+import itstoony.com.github.mercearia.exception.BusinessException;
 import itstoony.com.github.mercearia.model.Product.Product;
 
 import itstoony.com.github.mercearia.repository.ProductRepository;
@@ -26,8 +27,7 @@ import java.util.Optional;
 import static itstoony.com.github.mercearia.product.utils.Utils.createValidProduct;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(SpringExtension.class)
 @ActiveProfiles("test")
@@ -179,4 +179,97 @@ class ProductServiceTest {
 
    }
 
+
+   @Test
+   @DisplayName("Should add quantity to a product")
+   void addStorageTest() {
+      // scenery
+      Product updatingProduct = createValidProduct();
+      int quantity = 5;
+
+      when(repository.save(updatingProduct)).thenReturn(updatingProduct);
+
+      // execution
+      Product updatedProduct = service.addStorage(updatingProduct, quantity);
+
+      // validation
+      assertThat(updatedProduct.getId()).isEqualTo(updatingProduct.getId());
+      assertThat(updatedProduct.getQuantity()).isEqualTo(updatingProduct.getQuantity());
+
+      verify(repository, times(1)).save(any(Product.class));
+
+   }
+
+   @Test
+   @DisplayName("Should throw BusinessException when passed quantity is equal or less then 0")
+   void addQuantityLessThanZeroTest() {
+      // scenery
+      Product product = createValidProduct();
+      int quantity = -2;
+
+      // execution
+      Throwable exception = catchThrowable(() -> service.addStorage(product, quantity));
+
+      // validation
+      assertThat(exception)
+              .isInstanceOf(BusinessException.class)
+              .hasMessage("Passed quantity should be equal or higher than 1");
+
+      verify(repository, never()).save(any(Product.class));
+   }
+
+   @Test
+   @DisplayName("Should remove quantity from a product")
+   void removeStorage() {
+      // scenery
+      Product updatingProduct = createValidProduct();
+      int quantity = 5;
+
+      when(repository.save(updatingProduct)).thenReturn(updatingProduct);
+
+      // execution
+      Product updatedProduct = service.addStorage(updatingProduct, quantity);
+
+      // validation
+      assertThat(updatedProduct.getId()).isEqualTo(updatingProduct.getId());
+      assertThat(updatedProduct.getQuantity()).isEqualTo(updatingProduct.getQuantity());
+
+      verify(repository, times(1)).save(any(Product.class));
+   }
+
+   @Test
+   @DisplayName("Should throw BusinessException when passed quantity is equal or less then 0")
+   void removeQuantityLessThanZeroTest() {
+      // scenery
+      Product product = createValidProduct();
+      int quantity = -2;
+
+      // execution
+      Throwable exception = catchThrowable(() -> service.addStorage(product, quantity));
+
+      // validation
+      assertThat(exception)
+              .isInstanceOf(BusinessException.class)
+              .hasMessage("Passed quantity should be equal or higher than 1");
+
+      verify(repository, never()).save(any(Product.class));
+   }
+
+   @Test
+   @DisplayName("Should throw BusinessException when passed quantity is higher than products current quantity")
+   void removeQuantityHigherThanProductsCurrentQuantityTest() {
+      // scenery
+      Product product = createValidProduct();
+      int quantity = -2;
+
+      // execution
+      Throwable exception = catchThrowable(() -> service.addStorage(product, quantity));
+
+      // validation
+      assertThat(exception)
+              .isInstanceOf(BusinessException.class)
+              .hasMessage("Passed quantity should be equal or higher than 1");
+
+      verify(repository, never()).save(any(Product.class));
+   }
 }
