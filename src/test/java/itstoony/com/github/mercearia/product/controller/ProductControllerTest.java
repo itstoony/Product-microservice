@@ -216,7 +216,7 @@ class ProductControllerTest {
       Product product = createValidProduct();
       String name = "Refrig";
       given( productService.listAll(any(String.class), any(Pageable.class) ) )
-              .willReturn(new PageImpl<>(Collections.singletonList(product), Pageable.ofSize(100), 1) );
+              .willReturn(new PageImpl<>(Collections.singletonList(product), Pageable.ofSize(20), 1) );
 
       // execution
       MockHttpServletRequestBuilder request = MockMvcRequestBuilders
@@ -228,7 +228,7 @@ class ProductControllerTest {
               .andExpect(status().isOk())
               .andExpect(jsonPath("content", hasSize(1)))
               .andExpect(jsonPath("totalElements").value(1))
-              .andExpect( jsonPath("pageable.pageSize").value(100))
+              .andExpect( jsonPath("pageable.pageSize").value(20))
               .andExpect( jsonPath("pageable.pageNumber").value(0));
    }
 
