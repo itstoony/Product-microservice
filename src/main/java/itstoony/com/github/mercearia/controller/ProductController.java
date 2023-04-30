@@ -56,4 +56,24 @@ public class ProductController {
         Product product = productService.findById(id).orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND) );
         productService.delete(product);
     }
+
+    @PatchMapping("/{id}/storage/add/{quantity}")
+    public ProductDTO addStorage(@PathVariable(value = "id") Long id,
+                           @PathVariable(value = "quantity") Integer quantity) {
+        Product updatingProduct = productService.findById(id).orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND) );
+
+        Product updatedProduct = productService.addStorage(updatingProduct, quantity);
+
+        return modelMapper.map(updatedProduct, ProductDTO.class);
+    }
+
+    @PatchMapping("/{id}/storage/remove/{quantity}")
+    public ProductDTO removeStorage(@PathVariable(value = "id") Long id,
+                                 @PathVariable(value = "quantity") Integer quantity) {
+        Product updatingProduct = productService.findById(id).orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND) );
+
+        Product updatedProduct = productService.removeStorage(updatingProduct, quantity);
+
+        return modelMapper.map(updatedProduct, ProductDTO.class);
+    }
 }

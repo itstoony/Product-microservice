@@ -1,5 +1,6 @@
 package itstoony.com.github.mercearia.service;
 
+import itstoony.com.github.mercearia.exception.BusinessException;
 import itstoony.com.github.mercearia.model.Product.Product;
 import itstoony.com.github.mercearia.dto.ProductDTO;
 import itstoony.com.github.mercearia.repository.ProductRepository;
@@ -46,4 +47,31 @@ public class ProductService {
         }
         repository.delete(product);
     }
+
+    public Product addStorage(Product product, Integer quantity) {
+
+        if (quantity <= 0) {
+            throw new BusinessException("Passed quantity should be equal or higher than 1");
+        }
+
+        product.setQuantity(product.getQuantity() + quantity);
+
+        return repository.save(product);
+    }
+
+    public Product removeStorage(Product product, Integer quantity) {
+
+        if (quantity <= 0) {
+            throw new BusinessException("Passed quantity should be equal or higher than 1");
+        }
+
+        if (quantity > product.getQuantity()) {
+            throw new BusinessException("Product's current quantity is less than passed quantity");
+        }
+
+        product.setQuantity(product.getQuantity() - quantity);
+
+        return repository.save(product);
+    }
+
 }

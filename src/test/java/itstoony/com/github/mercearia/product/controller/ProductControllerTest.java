@@ -3,12 +3,11 @@ package itstoony.com.github.mercearia.product.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import itstoony.com.github.mercearia.dto.ProductDTO;
 import itstoony.com.github.mercearia.model.Product.Product;
+import itstoony.com.github.mercearia.exception.BusinessException;
 import itstoony.com.github.mercearia.service.ProductService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.BDDMockito;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -29,6 +28,9 @@ import java.util.Optional;
 import static itstoony.com.github.mercearia.product.utils.Utils.createValidProduct;
 import static itstoony.com.github.mercearia.product.utils.Utils.createValidProductDTO;
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -57,7 +59,7 @@ class ProductControllerTest {
 
       String json = new ObjectMapper().writeValueAsString(dto);
 
-      BDDMockito.given( productService.register(Mockito.any(Product.class)) ).willReturn(product);
+      given( productService.register(any(Product.class)) ).willReturn(product);
       // execution
       MockHttpServletRequestBuilder request = MockMvcRequestBuilders
               .post(PRODUCT_API)
@@ -121,8 +123,8 @@ class ProductControllerTest {
 
       String json = new ObjectMapper().writeValueAsString(dto);
 
-      BDDMockito.given( productService.findById(id) ).willReturn(Optional.of(product));
-      BDDMockito.given( productService.update(Mockito.any(Product.class), Mockito.any(ProductDTO.class)) ).willReturn(updatedProduct);
+      given( productService.findById(id) ).willReturn(Optional.of(product));
+      given( productService.update(any(Product.class), any(ProductDTO.class)) ).willReturn(updatedProduct);
 
       // execution
       MockHttpServletRequestBuilder request = MockMvcRequestBuilders
@@ -147,7 +149,7 @@ class ProductControllerTest {
       // scenery
       Long id = 1L;
 
-      BDDMockito.given( productService.findById(id) ).willReturn(Optional.empty());
+      given( productService.findById(id) ).willReturn(Optional.empty());
       ProductDTO dto = createValidProductDTO();
 
       String json = new ObjectMapper().writeValueAsString(dto);
@@ -172,7 +174,7 @@ class ProductControllerTest {
       Long id = 1L;
       Product product = createValidProduct();
 
-      BDDMockito.given( productService.findById(id) ).willReturn(Optional.of(product) );
+      given( productService.findById(id) ).willReturn(Optional.of(product) );
 
       // execution
       MockHttpServletRequestBuilder request = MockMvcRequestBuilders
@@ -195,7 +197,7 @@ class ProductControllerTest {
       // scenery
       Long id = 1L;
 
-      BDDMockito.given( productService.findById(id) ).willReturn(Optional.empty());
+      given( productService.findById(id) ).willReturn(Optional.empty());
 
       // execution
       MockHttpServletRequestBuilder request = MockMvcRequestBuilders
@@ -213,7 +215,7 @@ class ProductControllerTest {
       // scenery
       Product product = createValidProduct();
       String name = "Refrig";
-      BDDMockito.given( productService.listAll(Mockito.any(String.class), Mockito.any(Pageable.class) ) )
+      given( productService.listAll(any(String.class), any(Pageable.class) ) )
               .willReturn(new PageImpl<>(Collections.singletonList(product), Pageable.ofSize(100), 1) );
 
       // execution
@@ -237,7 +239,7 @@ class ProductControllerTest {
       long id = 1L;
       Product product = createValidProduct();
 
-      BDDMockito.given( productService.findById(id) ).willReturn(Optional.of(product));
+      given( productService.findById(id) ).willReturn(Optional.of(product));
 
       // execution
       MockHttpServletRequestBuilder request = MockMvcRequestBuilders
@@ -256,7 +258,7 @@ class ProductControllerTest {
       // scenery
       long id = 1L;
 
-      BDDMockito.given( productService.findById(id) ).willReturn(Optional.empty());
+      given( productService.findById(id) ).willReturn(Optional.empty());
 
       // execution
       MockHttpServletRequestBuilder request = MockMvcRequestBuilders
@@ -266,6 +268,158 @@ class ProductControllerTest {
       mvc
               .perform(request)
               .andExpect(status().isNotFound());
+
+   }
+
+   @Test
+      @DisplayName("Should add quantity to a products storage")
+   void addStorageTest() throws Exception {
+      // scenery
+      int quantity = 5;
+
+      long id = 1L;
+      Product updatingProduct = createValidProduct();
+      updatingProduct.setId(id);
+
+      Product updatedProduct = createValidProduct();
+      updatingProduct.setId(id);
+      updatedProduct.setQuantity(updatingProduct.getQuantity() + quantity);
+
+      given(productService.findById(id)).willReturn(Optional.of(updatingProduct));
+      given(productService.addStorage(any(Product.class), anyInt()))
+              .willReturn(updatedProduct);
+
+      // execution
+      MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+              .patch(PRODUCT_API.concat("/" + id + "/storage/add/" + quantity))
+              .accept(MediaType.APPLICATION_JSON);
+
+      // validation
+      mvc
+              .perform(request)
+              .andExpect(status().isOk())
+              .andExpect(jsonPath("id").value(id))
+              .andExpect(jsonPath("quantity").value(updatedProduct.getQuantity()));
+   }
+
+   @Test
+   @DisplayName("Should return Bad Request when passed quantity is equal or lower than 0")
+   void addInvalidQuantityTest() throws Exception {
+      // scenery
+      int quantity = 5;
+
+      long id = 1L;
+      Product updatingProduct = createValidProduct();
+      updatingProduct.setId(id);
+
+      String errorMessage = "Passed quantity should be equal or higher than 1";
+
+      given(productService.findById(id)).willReturn(Optional.of(updatingProduct));
+      given(productService.addStorage(any(Product.class), anyInt()))
+              .willThrow(new BusinessException(errorMessage));
+
+      // execution
+      MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+              .patch(PRODUCT_API.concat("/" + id + "/storage/add/" + quantity))
+              .accept(MediaType.APPLICATION_JSON);
+
+      // validation
+      mvc
+              .perform(request)
+              .andExpect(status().isBadRequest())
+              .andExpect(jsonPath("errors", hasSize(1)))
+              .andExpect(jsonPath("errors[0]").value(errorMessage));
+
+   }
+
+   @Test
+   @DisplayName("Should remove quantity from a product")
+   void removeQuantityTest() throws Exception {
+      // scenery
+      int quantity = 5;
+
+      long id = 1L;
+      Product updatingProduct = createValidProduct();
+      updatingProduct.setId(id);
+
+      Product updatedProduct = createValidProduct();
+      updatingProduct.setId(id);
+      updatedProduct.setQuantity(updatingProduct.getQuantity() - quantity);
+
+      given(productService.findById(id)).willReturn(Optional.of(updatingProduct));
+      given(productService.removeStorage(any(Product.class), anyInt()))
+              .willReturn(updatedProduct);
+
+      // execution
+      MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+              .patch(PRODUCT_API.concat("/" + id + "/storage/remove/" + quantity))
+              .accept(MediaType.APPLICATION_JSON);
+
+      // validation
+      mvc
+              .perform(request)
+              .andExpect(status().isOk())
+              .andExpect(jsonPath("id").value(id))
+              .andExpect(jsonPath("quantity").value(updatedProduct.getQuantity()));
+   }
+
+   @Test
+   @DisplayName("Should return Bad Request when passed quantity is less then products current quantity")
+   void removeInvalidStorageTest() throws Exception {
+      // scenery
+      int quantity = 5;
+
+      long id = 1L;
+      Product updatingProduct = createValidProduct();
+      updatingProduct.setId(id);
+
+      String errorMessage = "Product's current quantity is less than passed quantity";
+
+      given(productService.findById(id)).willReturn(Optional.of(updatingProduct));
+      given(productService.removeStorage(any(Product.class), anyInt()))
+              .willThrow(new BusinessException(errorMessage));
+
+      // execution
+      MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+              .patch(PRODUCT_API.concat("/" + id + "/storage/remove/" + quantity))
+              .accept(MediaType.APPLICATION_JSON);
+
+      // validation
+      mvc
+              .perform(request)
+              .andExpect(status().isBadRequest())
+              .andExpect(jsonPath("errors", hasSize(1)))
+              .andExpect(jsonPath("errors[0]").value(errorMessage));
+
+   }
+
+   @Test
+   @DisplayName("Should return Bad Request when passed quantity is equal or lower than 0")
+   void removeInvalidQuantityTest() throws Exception {
+      // scenery
+      int quantity = 5;
+
+      long id = 1L;
+      Product updatingProduct = createValidProduct();
+      updatingProduct.setId(id);
+
+      String errorMessage = "Passed quantity should be equal or higher than 1";
+
+      given(productService.findById(id)).willReturn(Optional.of(updatingProduct));
+      given(productService.removeStorage(any(Product.class), anyInt()))
+              .willThrow(new BusinessException(errorMessage));
+
+      // execution
+      MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+              .patch(PRODUCT_API.concat("/" + id + "/storage/remove/" + quantity))
+              .accept(MediaType.APPLICATION_JSON);
+
+      // validation
+      mvc
+              .perform(request)
+              .andExpect(status().isBadRequest())
+              .andExpect(jsonPath("errors", hasSize(1)))
+              .andExpect(jsonPath("errors[0]").value(errorMessage));
 
    }
 
