@@ -9,6 +9,7 @@ import itstoony.com.github.mercearia.service.ProductService;
 import itstoony.com.github.mercearia.dto.ProductDTO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -26,6 +27,7 @@ import java.util.List;
 @RequestMapping("/api/product")
 @RequiredArgsConstructor
 @Tag(name = "Product", description = "API responsible for Product management")
+@Slf4j
 public class ProductController {
 
     private final ModelMapper modelMapper;
@@ -40,6 +42,8 @@ public class ProductController {
             @ApiResponse(responseCode = "403", description = "User not authenticated.")
     })
     public ResponseEntity<ProductDTO> register(@RequestBody @Valid ProductDTO dto) {
+        log.info("Registering a product: {}", dto.getName());
+
         Product product = modelMapper.map(dto, Product.class);
         Product savedProduct = productService.register(product);
 
@@ -59,6 +63,7 @@ public class ProductController {
             @ApiResponse(responseCode = "403", description = "User not authenticated.")
     })
     public ResponseEntity<ProductDTO> update(@PathVariable Long id, @RequestBody ProductDTO dto) {
+        log.info("Updating product: {}", dto.getName());
         Product product = productService.findById(id).orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND) );
 
         Product updatedProduct = productService.update(product, dto);
@@ -76,6 +81,8 @@ public class ProductController {
             @ApiResponse(responseCode = "403", description = "User not authenticated.")
     })
     public ResponseEntity<ProductDTO> findById(@PathVariable Long id) {
+        log.info("Finding product by id: {}", id);
+
         Product product = productService
                 .findById(id)
                 .orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND));
@@ -93,6 +100,8 @@ public class ProductController {
             @ApiResponse(responseCode = "403", description = "User not authenticated.")
     })
     public ResponseEntity<PageImpl<ProductDTO>> listAllProducts(@RequestParam String name, Pageable pageable) {
+        log.info("Listing product by name: {}", name);
+
         Page<Product> page = productService.listAll(name, pageable);
 
         List<ProductDTO> listDTO = page
@@ -112,6 +121,8 @@ public class ProductController {
             @ApiResponse(responseCode = "403", description = "User not authenticated.")
     })
     public ResponseEntity<Void> delete(@PathVariable Long id) {
+        log.info("Deleting product by id: {}", id);
+
         Product product = productService.findById(id).orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND) );
         productService.delete(product);
 
@@ -127,6 +138,8 @@ public class ProductController {
     })
     public ResponseEntity<ProductDTO> addStorage(@PathVariable(value = "id") Long id,
                                                  @PathVariable(value = "quantity") Integer quantity) {
+        log.info("Adding {} units to product with ID: {}", quantity, id);
+
         Product updatingProduct = productService.findById(id).orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND) );
 
         Product updatedProduct = productService.addStorage(updatingProduct, quantity);
@@ -145,6 +158,8 @@ public class ProductController {
     })
     public ResponseEntity<ProductDTO> removeStorage(@PathVariable(value = "id") Long id,
                                                     @PathVariable(value = "quantity") Integer quantity) {
+        log.info("Removing {} units to product with ID: {}", quantity, id);
+
         Product updatingProduct = productService.findById(id).orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND) );
 
         Product updatedProduct = productService.removeStorage(updatingProduct, quantity);
