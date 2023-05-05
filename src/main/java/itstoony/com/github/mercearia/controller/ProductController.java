@@ -1,5 +1,9 @@
 package itstoony.com.github.mercearia.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import itstoony.com.github.mercearia.model.Product.Product;
 import itstoony.com.github.mercearia.service.ProductService;
 import itstoony.com.github.mercearia.dto.ProductDTO;
@@ -21,6 +25,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/product")
 @RequiredArgsConstructor
+@Tag(name = "Product", description = "API responsible for Product management")
 public class ProductController {
 
     private final ModelMapper modelMapper;
@@ -28,6 +33,12 @@ public class ProductController {
     private final ProductService productService;
 
     @PostMapping
+    @Operation(summary = "Create a product")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Product registered successfully."),
+            @ApiResponse(responseCode = "400", description = "Failed to register a product."),
+            @ApiResponse(responseCode = "403", description = "User not authenticated.")
+    })
     public ResponseEntity<ProductDTO> register(@RequestBody @Valid ProductDTO dto) {
         Product product = modelMapper.map(dto, Product.class);
         Product savedProduct = productService.register(product);
@@ -41,6 +52,12 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Update a product")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Product updated successfully."),
+            @ApiResponse(responseCode = "400", description = "Failed to update a contact."),
+            @ApiResponse(responseCode = "403", description = "User not authenticated.")
+    })
     public ResponseEntity<ProductDTO> update(@PathVariable Long id, @RequestBody ProductDTO dto) {
         Product product = productService.findById(id).orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND) );
 
@@ -52,6 +69,12 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Get a product")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Product found successfully."),
+            @ApiResponse(responseCode = "400", description = "Failed to find a product."),
+            @ApiResponse(responseCode = "403", description = "User not authenticated.")
+    })
     public ResponseEntity<ProductDTO> findById(@PathVariable Long id) {
         Product product = productService
                 .findById(id)
@@ -63,6 +86,12 @@ public class ProductController {
     }
 
     @GetMapping("/list")
+    @Operation(summary = "List all products")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Product page found successfully."),
+            @ApiResponse(responseCode = "400", description = "Failed to find a product."),
+            @ApiResponse(responseCode = "403", description = "User not authenticated.")
+    })
     public ResponseEntity<PageImpl<ProductDTO>> listAllProducts(@RequestParam String name, Pageable pageable) {
         Page<Product> page = productService.listAll(name, pageable);
 
@@ -76,6 +105,12 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete a product")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Product deleted successfully."),
+            @ApiResponse(responseCode = "400", description = "Failed to delete a product."),
+            @ApiResponse(responseCode = "403", description = "User not authenticated.")
+    })
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         Product product = productService.findById(id).orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND) );
         productService.delete(product);
@@ -84,6 +119,12 @@ public class ProductController {
     }
 
     @PatchMapping("/{id}/storage/add/{quantity}")
+    @Operation(summary = "Add quantity to a product's storage")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Quantity added successfully."),
+            @ApiResponse(responseCode = "400", description = "Failed to add quantity to a product."),
+            @ApiResponse(responseCode = "403", description = "User not authenticated.")
+    })
     public ResponseEntity<ProductDTO> addStorage(@PathVariable(value = "id") Long id,
                                                  @PathVariable(value = "quantity") Integer quantity) {
         Product updatingProduct = productService.findById(id).orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND) );
@@ -96,6 +137,12 @@ public class ProductController {
     }
 
     @PatchMapping("/{id}/storage/remove/{quantity}")
+    @Operation(summary = "Remove quantity from a product's storage")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Quantity removed successfully."),
+            @ApiResponse(responseCode = "400", description = "Failed to remove quantity from a product."),
+            @ApiResponse(responseCode = "403", description = "User not authenticated.")
+    })
     public ResponseEntity<ProductDTO> removeStorage(@PathVariable(value = "id") Long id,
                                                     @PathVariable(value = "quantity") Integer quantity) {
         Product updatingProduct = productService.findById(id).orElseThrow( () -> new ResponseStatusException(HttpStatus.NOT_FOUND) );
