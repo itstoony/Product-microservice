@@ -1,15 +1,18 @@
 package github.com.itstoony.product.product.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import github.com.itstoony.product.controller.ProductController;
 import github.com.itstoony.product.dto.ProductDTO;
-import github.com.itstoony.product.service.ProductService;
-import github.com.itstoony.product.model.Product.Product;
 import github.com.itstoony.product.exception.BusinessException;
+import github.com.itstoony.product.model.Product.Product;
+import github.com.itstoony.product.repository.UserRepository;
+import github.com.itstoony.product.security.jwt.TokenService;
+import github.com.itstoony.product.service.ProductService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageImpl;
@@ -20,6 +23,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import java.math.BigDecimal;
 import java.util.Collections;
@@ -34,9 +39,8 @@ import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@AutoConfigureMockMvc
 @ExtendWith(SpringExtension.class)
-@WebMvcTest
+@WebMvcTest(controllers = ProductController.class)
 @ActiveProfiles("test")
 class ProductControllerTest {
 
@@ -46,7 +50,23 @@ class ProductControllerTest {
    ProductService productService;
 
    @Autowired
+   WebApplicationContext webApplicationContext;
+
    MockMvc mvc;
+
+   @MockBean
+   TokenService tokenService;
+
+   @MockBean
+   UserRepository repository;
+
+
+   @BeforeEach
+   void setUp() {
+      mvc = MockMvcBuilders
+              .webAppContextSetup(webApplicationContext)
+              .build();
+   }
 
 
    @Test
