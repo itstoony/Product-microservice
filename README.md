@@ -21,12 +21,21 @@ Created to integrate the e-commerce application (https://github.com/itstoony/E-c
 
 ### Setup
 
-Fork `master` branch into your personal repository. Clone it to local computer. Install maven dependencies. Before starting development, you should set the application.properties to 'dev' in order to use H2 Database or set the environment variables "DATASOURCE", "USERNAME", "PASSWORD" for production Database.
+Fork `master` branch into your personal repository. Clone it to local computer. Install maven dependencies. Before starting development, you should set the application.properties to 'dev' in order to use H2 Database or set the environment variables. 
 
 ```sh
 $ git clone https://github.com/itstoony/Product-microservice.git
 $ mvn clean install
 ```
+<hr>
+
+### Path Variables:
+
+JWT_SECRET = "Secret Key" for JWT Authentication. <br>
+DATASOURCE = Database address. <br>
+USERNAME = Database username. <br> 
+PASSWORD = Database password. <br>
+
 <hr>
 
 ## 👨🏻‍💻 Developer 👨🏻‍💻
